@@ -20,25 +20,11 @@ metric = [
 def read_metric(i):
    
    fraw = open(iiodev + metric[i] + "_raw")
-   fscale = open(iiodev + metric[i] + "_scale")
-   if (i == 0):
-      foffset = open(iiodev + metric[i] + "_offset")
-   
    raw = (int)(fraw.read())
-   scale = (float)(fscale.read())
 
-   if (i == 0):
-      offset = (int)(foffset.read())
-      value = (int)(((raw - offset) / scale) * 100)  # degC/100
-      can_byte1 = (int)(value / 100)
-   else:
-      value = (int)((raw * scale) / 10)   # V/100
-      can_byte1 = (int)(value / 100)
-
-   can_byte2 = value - (can_byte1 * 100)
+   (can_byte1, can_byte2) = (raw & 0x00FF), ( (raw & 0xFF00) >> 8)
 
    return [can_byte1, can_byte2]
-   
 
 def canprod(bus):
 
@@ -47,7 +33,7 @@ def canprod(bus):
    msg = []
 
    for i in range(9):
-      msg.append(can.Message(arbitration_id=0xFA, data=[i] + read_metric(i), is_extended_id=False))
+      msg.append(can.Message(arbitration_id=0xCB, data=[i] + read_metric(i), is_extended_id=False))
 
    while 1:
 

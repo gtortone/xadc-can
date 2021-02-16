@@ -42,7 +42,7 @@ def canprod(bus):
          bus.send(msg[i])
 
       # msg update frequency
-      sleep(2)
+      sleep(30)
 
 if __name__ == "__main__":
 
